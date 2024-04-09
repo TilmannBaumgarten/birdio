@@ -3,7 +3,13 @@ import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { Resource } from "sst";
 
 export async function handler(event: any) {
-  const tableName = Resource.Connections.name;
+  const tableName = Resource.ConnectionsTable.name;
+
+  if (!event.queryStringParameters.id) {
+    return {
+      statusCode: 400,
+    };
+  }
 
   const client = new DynamoDBClient({});
   const docClient = DynamoDBDocumentClient.from(client);
@@ -12,6 +18,7 @@ export async function handler(event: any) {
     TableName: tableName,
     Item: {
       connectionId: event.requestContext.connectionId,
+      id: event.queryStringParameters.id,
     },
   });
 
